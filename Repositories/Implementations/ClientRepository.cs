@@ -31,12 +31,20 @@ public class ClientRepository : IClientRepository
         }
     }
 
+    public async Task<Client> GetClientByEmailAsync(string email)
+    {
+        return await _context.Clients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Email == email);
+    }
+
     public async Task<Client> GetClientByIdAsync(int clientId)
     {
         return await _context.Clients
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.ClientId == clientId);
     }
+
 
     public async Task<List<Client>> GetClientsAsync()
     {

@@ -9,4 +9,5 @@ public interface IClientRepository
     Task<Client> UpdateClientAsync(int clientId, Client client);
     Task DeleteClientAsync(int clientId);
     Task<Client> GetClientByIdAsync(int clientId);
+    Task<Client> GetClientByEmailAsync(string email);
 }
