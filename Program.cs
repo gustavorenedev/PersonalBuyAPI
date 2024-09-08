@@ -136,6 +136,15 @@ cartApi.MapGet("/{clientId}", async (int clientId, ICartService cartService) => 
     .WithTags("Carts")
     .WithDescription("Obtém o carrinho de compras de um cliente pelo ID.");
 
+cartApi.MapPost("/{clientId}/create", async (int clientId, ICartService cartService) =>
+{
+    var createCart = await cartService.CreateCartForClientAsync(clientId);
+    return Results.Ok(createCart);
+})
+    .WithName("CreateCartForClientAsync")
+    .WithTags("Carts")
+    .WithDescription("Cria um carrinho de compras para um cliente.");
+
 cartApi.MapPost("/{clientId}/add", async (int clientId, [FromBody] CartDTO.CartItemDTO cartItemDto, ICartService cartService) =>
 {
     var updatedCart = await cartService.AddProductToCartAsync(clientId, cartItemDto);

@@ -83,9 +83,5 @@ public class ProductService : IProductService
         // Valida se o preço é um valor positivo
         if (productDto.Price <= 0)
             throw new ValidationException("O preço do produto deve ser um valor positivo");
-
-        // Valida se a quantidade é um valor não negativo
-        if (productDto.Quantity < 0)
-            throw new ValidationException("A quantidade do produto não pode ser negativa");
     }
 }

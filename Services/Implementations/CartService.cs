@@ -42,17 +42,13 @@ public class CartService : ICartService
         return MapToCartDTO(cart);
     }
 
-    // Adiciona um produto ao carrinho existente ou cria um carrinho se não existir
+    // Adiciona um produto ao carrinho existente
     public async Task<CartDTO> AddProductToCartAsync(int clientId, CartDTO.CartItemDTO cartItemDto)
     {
         var cart = await _cartRepository.GetCartByClientIdAsync(clientId);
         if (cart == null)
         {
-            cart = new Cart
-            {
-                ClientId = clientId,
-                Items = new List<ItemCart>()
-            };
+            throw new ArgumentException("Crie um carrinho para o cliente adicionar produtos nele");
         }
 
         var existingItem = cart.Items.FirstOrDefault(item => item.ProductId == cartItemDto.ProductId);
@@ -63,10 +59,14 @@ public class CartService : ICartService
         else
         {
             var product = await _productRepository.GetProductByIdAsync(cartItemDto.ProductId);
+            if (product == null)
+            {
+                throw new ArgumentException("Produto não encontrado");
+            }
+
             cart.Items.Add(new ItemCart
             {
                 ProductId = cartItemDto.ProductId,
-                Product = product,
                 Quantity = cartItemDto.Quantity
             });
         }
@@ -74,6 +74,7 @@ public class CartService : ICartService
         await _cartRepository.UpdateCartAsync(cart);
         return MapToCartDTO(cart);
     }
+
 
 
     // Remove um produto do carrinho
@@ -96,25 +97,29 @@ public class CartService : ICartService
     public async Task<CartDTO> UpdateProductQuantityInCartAsync(int clientId, int productId, int quantityChange)
     {
         var cart = await _cartRepository.GetCartByClientIdAsync(clientId);
-        if (cart != null)
+        if (cart == null)
         {
-            var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
-            if (item != null)
-            {
-                item.Quantity += quantityChange;
-                if (item.Quantity <= 0)
-                {
-                    cart.Items.Remove(item);
-                }
-                else
-                {
-                    item.Product.Price = await _productRepository.GetProductPriceAsync(productId);
-                }
-                await _cartRepository.UpdateCartAsync(cart);
-            }
+            throw new ArgumentException("Carrinho não encontrado para o cliente.");
         }
+
+        var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+        if (item == null)
+        {
+            throw new ArgumentException("Produto não encontrado no carrinho.");
+        }
+
+        item.Quantity = quantityChange;
+
+        if (item.Quantity <= 0)
+        {
+            cart.Items.Remove(item);
+        }
+
+        await _cartRepository.UpdateCartAsync(cart);
         return MapToCartDTO(cart);
     }
+
+
 
     private CartDTO MapToCartDTO(Cart cart)
     {
@@ -125,9 +130,7 @@ public class CartService : ICartService
             Items = cart.Items.Select(i => new CartDTO.CartItemDTO
             {
                 ProductId = i.ProductId,
-                ProductName = i.Product.Name,
                 Quantity = i.Quantity,
-                Price = i.Product.Price
             }).ToList()
         };
     }
