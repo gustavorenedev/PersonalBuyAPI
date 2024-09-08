@@ -10,4 +10,5 @@ public interface IProductRepository
     Task DeleteProductAsync(int productId);
     Task<Product> GetProductByNameAsync(string name);
     Task<Product> GetProductByIdAsync(int productId);
+    Task<decimal> GetProductPriceAsync(int productId);
 }

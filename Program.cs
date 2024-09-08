@@ -22,12 +22,12 @@ builder.Services.AddDbContext<ApplicationContext>(o =>
 // Registro dos Repositories
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-//builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 // Registro dos Services
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-//builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 // Configuração do AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -124,6 +124,44 @@ productApi.MapDelete("/{id}", async (int id, IProductService productService) =>
     .WithName("DeleteProduct")
     .WithTags("Products")
     .WithDescription("Exclui um produto pelo ID.");
+#endregion
+
+#region Rotas para Cart
+var cartApi = app.MapGroup("/cart");
+
+cartApi.MapGet("/{clientId}", async (int clientId, ICartService cartService) => await cartService.GetCartByClientIdAsync(clientId) is { } cart
+    ? Results.Ok(cart)
+    : Results.NotFound())
+    .WithName("GetCartByClientId")
+    .WithTags("Carts")
+    .WithDescription("Obtém o carrinho de compras de um cliente pelo ID.");
+
+cartApi.MapPost("/{clientId}/add", async (int clientId, [FromBody] CartDTO.CartItemDTO cartItemDto, ICartService cartService) =>
+{
+    var updatedCart = await cartService.AddProductToCartAsync(clientId, cartItemDto);
+    return Results.Ok(updatedCart);
+})
+    .WithName("AddProductToCart")
+    .WithTags("Carts")
+    .WithDescription("Adiciona um produto ao carrinho de compras de um cliente.");
+
+cartApi.MapDelete("/{clientId}/remove/{productId}", async (int clientId, int productId, ICartService cartService) =>
+{
+    var updatedCart = await cartService.RemoveProductFromCartAsync(clientId, productId);
+    return Results.Ok(updatedCart);
+})
+    .WithName("RemoveProductFromCart")
+    .WithTags("Carts")
+    .WithDescription("Remove um produto do carrinho de compras de um cliente.");
+
+cartApi.MapPut("/{clientId}/update/{productId}/{quantityChange}", async (int clientId, int productId, int quantityChange, ICartService cartService) =>
+{
+    var updatedCart = await cartService.UpdateProductQuantityInCartAsync(clientId, productId, quantityChange);
+    return Results.Ok(updatedCart);
+})
+    .WithName("UpdateProductQuantityInCart")
+    .WithTags("Carts")
+    .WithDescription("Atualiza a quantidade de um produto no carrinho de compras de um cliente.");
 #endregion
 
 app.Run();

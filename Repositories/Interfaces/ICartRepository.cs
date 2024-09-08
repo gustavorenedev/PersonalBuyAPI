@@ -4,7 +4,7 @@ namespace EcommerceAPI.Repositories.Interfaces;
 
 public interface ICartRepository
 {
-    Task<Cart> GetCartByClientId(int clientId);
-    Task CreateCart(Cart cart);
-    Task UpdateCart(Cart cart);
+    Task<Cart> GetCartByClientIdAsync(int clientId);
+    Task CreateCartAsync(Cart cart);
+    Task UpdateCartAsync(Cart cart);
 }

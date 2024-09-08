@@ -43,6 +43,14 @@ public class ProductRepository : IProductRepository
                 .FirstOrDefaultAsync(p => p.Name == name);
     }
 
+    public async Task<decimal> GetProductPriceAsync(int productId)
+    {
+        return await _context.Products
+                .Where(p => p.ProductId == productId)
+                .Select(p => p.Price)
+                .FirstOrDefaultAsync();
+    }
+
     public async Task<List<Product>> GetProductsAsync()
     {
         return await _context.Products.ToListAsync();
