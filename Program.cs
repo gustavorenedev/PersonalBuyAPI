@@ -28,6 +28,7 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Configuração do AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -40,9 +41,13 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Ecommerce API",
         Version = "v1",
-        Description = "API para gerenciamento de clientes, produtos e carrinhos de compras em um sistema de ecommerce."
+        Description = "API para gerenciamento de clientes, produtos e carrinhos de compras, com foco em uma ML para envio de sugestões de compras em emails no sistema de ecommerce."
     });
+
+    // Configurar exemplos de modelos de dados
+    c.SchemaFilter<SwaggerSchemaExamplesFilter>();
 });
+
 #endregion
 
 #region app
@@ -54,6 +59,43 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseRouting();
+#endregion
+
+#region Rotas para Auth
+var authApi = app.MapGroup("/auth");
+
+authApi.MapPost("/login", async ([FromBody] AuthDTO authDto, IAuthService authService) =>
+{
+    try
+    {
+        var result = await authService.LoginAsync(authDto);
+        return Results.Ok(result);
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return Results.Unauthorized();
+    }
+})
+    .WithName("Login")
+    .WithTags("Auth")
+    .WithDescription("Autentica um cliente e retorna uma mensagem de sucesso.");
+
+authApi.MapPost("/register", async ([FromBody] ClientDTO clientDto, IAuthService authService) =>
+{
+    try
+    {
+        await authService.RegisterAsync(clientDto);
+        return Results.Created($"/client/{clientDto.Email}", clientDto);
+    }
+    catch (InvalidOperationException)
+    {
+        return Results.BadRequest("Email already in use.");
+    }
+})
+    .WithName("Register")
+    .WithTags("Auth")
+    .WithDescription("Registra um novo cliente no sistema.");
+
 #endregion
 
 #region Rotas para Client
@@ -70,11 +112,6 @@ clientApi.MapGet("/{id}", async (int id, IClientService clientService) => await 
     .WithName("GetClientById")
     .WithTags("Clients")
     .WithDescription("Obtém um cliente específico pelo ID.");
-
-clientApi.MapPost("/", async ([FromBody] ClientDTO clientDto, IClientService clientService) => Results.Ok(await clientService.CreateClientAsync(clientDto)))
-    .WithName("CreateClient")
-    .WithTags("Clients")
-    .WithDescription("Cria um novo cliente.");
 
 clientApi.MapPut("/{id}", async (int id, [FromBody] ClientDTO clientDto, IClientService clientService) => Results.Ok(await clientService.UpdateClientAsync(id, clientDto)))
     .WithName("UpdateClient")
@@ -106,6 +143,7 @@ productApi.MapGet("/{id}", async (int id, IProductService productService) => awa
     .WithTags("Products")
     .WithDescription("Obtém um produto específico pelo ID.");
 
+
 productApi.MapPost("/", async ([FromBody] ProductDTO productDto, IProductService productService) => Results.Ok(await productService.CreateProductAsync(productDto)))
     .WithName("CreateProduct")
     .WithTags("Products")
@@ -129,9 +167,10 @@ productApi.MapDelete("/{id}", async (int id, IProductService productService) =>
 #region Rotas para Cart
 var cartApi = app.MapGroup("/cart");
 
-cartApi.MapGet("/{clientId}", async (int clientId, ICartService cartService) => await cartService.GetCartByClientIdAsync(clientId) is { } cart
-    ? Results.Ok(cart)
-    : Results.NotFound())
+cartApi.MapGet("/{clientId}", async (int clientId, ICartService cartService) =>
+    await cartService.GetCartByClientIdAsync(clientId) is { } cart
+        ? Results.Ok(cart)
+        : Results.NotFound())
     .WithName("GetCartByClientId")
     .WithTags("Carts")
     .WithDescription("Obtém o carrinho de compras de um cliente pelo ID.");
@@ -141,7 +180,7 @@ cartApi.MapPost("/{clientId}/create", async (int clientId, ICartService cartServ
     var createCart = await cartService.CreateCartForClientAsync(clientId);
     return Results.Ok(createCart);
 })
-    .WithName("CreateCartForClientAsync")
+    .WithName("CreateCartForClient")
     .WithTags("Carts")
     .WithDescription("Cria um carrinho de compras para um cliente.");
 
