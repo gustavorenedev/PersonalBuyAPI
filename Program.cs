@@ -39,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Ecommerce API",
+        Title = "Personal Buy API",
         Version = "v1",
         Description = "API para gerenciamento de clientes, produtos e carrinhos de compras, com foco em uma ML para envio de sugestões de compras em emails no sistema de ecommerce."
     });

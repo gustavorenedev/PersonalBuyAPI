@@ -11,6 +11,7 @@ public class SwaggerSchemaExamplesFilter : ISchemaFilter
         {
             schema.Example = new OpenApiObject
             {
+                ["clientId"] = new OpenApiInteger(1),
                 ["name"] = new OpenApiString("John Doe"),
                 ["email"] = new OpenApiString("john.doe@example.com"),
                 ["address"] = new OpenApiString("123 Main St, Anytown, USA"),
