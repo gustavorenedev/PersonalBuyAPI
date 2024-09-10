@@ -94,7 +94,7 @@ authApi.MapPost("/register", async ([FromBody] ClientDTO clientDto, IAuthService
 })
     .WithName("Register")
     .WithTags("Auth")
-    .WithDescription("Registra um novo cliente no sistema.");
+    .WithDescription("Registra um novo cliente no sistema. Não é necessário passar o ID, pode apagar");
 
 #endregion
 
@@ -116,7 +116,7 @@ clientApi.MapGet("/{id}", async (int id, IClientService clientService) => await 
 clientApi.MapPut("/{id}", async (int id, [FromBody] ClientDTO clientDto, IClientService clientService) => Results.Ok(await clientService.UpdateClientAsync(id, clientDto)))
     .WithName("UpdateClient")
     .WithTags("Clients")
-    .WithDescription("Atualiza os detalhes de um cliente existente.");
+    .WithDescription("Atualiza os detalhes de um cliente existente. Não é necessário passar o ID, pode apagar");
 
 clientApi.MapDelete("/{id}", async (int id, IClientService clientService) =>
 {
@@ -147,12 +147,12 @@ productApi.MapGet("/{id}", async (int id, IProductService productService) => awa
 productApi.MapPost("/", async ([FromBody] ProductDTO productDto, IProductService productService) => Results.Ok(await productService.CreateProductAsync(productDto)))
     .WithName("CreateProduct")
     .WithTags("Products")
-    .WithDescription("Cria um novo produto.");
+    .WithDescription("Cria um novo produto. Não é necessário passar o ID, pode apagar");
 
 productApi.MapPut("/{id}", async (int id, [FromBody] ProductDTO productDto, IProductService productService) => Results.Ok(await productService.UpdateProductAsync(id, productDto)))
     .WithName("UpdateProduct")
     .WithTags("Products")
-    .WithDescription("Atualiza os detalhes de um produto existente.");
+    .WithDescription("Atualiza os detalhes de um produto existente. Não é necessário passar o ID, pode apagar");
 
 productApi.MapDelete("/{id}", async (int id, IProductService productService) =>
 {

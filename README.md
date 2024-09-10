@@ -166,3 +166,38 @@ Implementamos o padrão Singleton para o **gerenciador de configurações**. Ess
 ### Documentação da API
 
 A documentação da API é configurada utilizando Swagger/OpenAPI. Você pode acessar a documentação detalhada em http://localhost:5267/swagger. A documentação inclui descrições claras dos endpoints, modelos de dados, e exemplos de requisições e respostas.
+
+## Como Baixar e Executar o Projeto
+
+Para baixar e executar o projeto, siga os passos abaixo:
+
+### Clonar o Repositório
+
+Utilize o comando `git clone` para clonar o repositório em sua máquina local:
+
+```bash
+git clone https://github.com/seu-usuario/seu-repositorio.git
+```
+
+### Restaurar as Dependências
+## Execute o comando para restaurar as dependências do projeto:
+
+No terminal:
+- dotnet restore
+
+## Configurar o Banco de Dados
+Certifique-se de que você tem um banco de dados Oracle configurado. Atualize as configurações de conexão no arquivo appsettings.json de acordo com suas configurações locais.
+
+## Migrar o Banco de Dados
+Aplique as migrações do banco de dados no terminal:
+- dotnet ef database update
+
+## Executar o Projeto
+Inicie a aplicação:
+
+- dotnet run
+
+## Acessar a API
+A API estará disponível em http://localhost:5267. Acesse a documentação em http://localhost:5267/swagger.
+
+Se você encontrar algum problema ou tiver dúvidas, consulte a documentação oficial do ASP.NET Core.
