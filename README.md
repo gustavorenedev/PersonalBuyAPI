@@ -176,7 +176,7 @@ Para baixar e executar o projeto, siga os passos abaixo:
 Utilize o comando `git clone` para clonar o repositório em sua máquina local:
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
+git clone https://github.com/gustavorenedev/PersonalBuyAPI.git
 ```
 
 ### Restaurar as Dependências
@@ -198,6 +198,6 @@ Inicie a aplicação:
 - dotnet run
 
 ## Acessar a API
-A API estará disponível em http://localhost:5267. Acesse a documentação em http://localhost:5267/swagger.
+A API estará disponível em http://localhost:5267/swagger. Acesse a documentação em http://localhost:5267/swagger.
 
 Se você encontrar algum problema ou tiver dúvidas, consulte a documentação oficial do ASP.NET Core.
