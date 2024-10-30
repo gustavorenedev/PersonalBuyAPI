@@ -1,4 +1,5 @@
-﻿using EcommerceAPI.DTOs;
+﻿using AutoMapper;
+using EcommerceAPI.DTOs;
 using EcommerceAPI.Model;
 using EcommerceAPI.Repositories.Interfaces;
 using EcommerceAPI.Services.Interfaces;
@@ -9,16 +10,30 @@ public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
     private readonly IProductRepository _productRepository;
+    private readonly IMapper _mapper;
 
-    public CartService(ICartRepository cartRepository, IProductRepository productRepository)
+    public CartService(ICartRepository cartRepository, IProductRepository productRepository, IMapper mapper)
     {
         _cartRepository = cartRepository;
         _productRepository = productRepository;
+        _mapper = mapper;
     }
 
     public async Task<CartDTO> GetCartByClientIdAsync(int clientId)
     {
         var cart = await _cartRepository.GetCartByClientIdAsync(clientId);
+
+        if (cart == null)
+        {
+            throw new ArgumentException("Carrinho não encontrado para o cliente.");
+        }
+
+        foreach (var item in cart.Items)
+        {
+            var product = await _productRepository.GetProductByIdAsync(item.ProductId);
+            item.Product = _mapper.Map<Product>(product);
+        }
+
         return MapToCartDTO(cart);
     }
 
@@ -43,7 +58,7 @@ public class CartService : ICartService
     }
 
     // Adiciona um produto ao carrinho existente
-    public async Task<CartDTO> AddProductToCartAsync(int clientId, CartDTO.CartItemDTO cartItemDto)
+    public async Task<CartDTO> AddProductToCartAsync(int clientId, AddProductoToCartDTO dto)
     {
         var cart = await _cartRepository.GetCartByClientIdAsync(clientId);
         if (cart == null)
@@ -51,14 +66,14 @@ public class CartService : ICartService
             throw new ArgumentException("Crie um carrinho para o cliente adicionar produtos nele");
         }
 
-        var existingItem = cart.Items.FirstOrDefault(item => item.ProductId == cartItemDto.ProductId);
+        var existingItem = cart.Items.FirstOrDefault(item => item.ProductId == dto.ItemId);
         if (existingItem != null)
         {
-            existingItem.Quantity += cartItemDto.Quantity;
+            existingItem.Quantity += dto.Quantity;
         }
         else
         {
-            var product = await _productRepository.GetProductByIdAsync(cartItemDto.ProductId);
+            var product = await _productRepository.GetProductByIdAsync(dto.ItemId);
             if (product == null)
             {
                 throw new ArgumentException("Produto não encontrado");
@@ -66,8 +81,8 @@ public class CartService : ICartService
 
             cart.Items.Add(new ItemCart
             {
-                ProductId = cartItemDto.ProductId,
-                Quantity = cartItemDto.Quantity
+                ProductId = dto.ItemId,
+                Quantity = dto.Quantity
             });
         }
 
@@ -119,7 +134,17 @@ public class CartService : ICartService
         return MapToCartDTO(cart);
     }
 
+    // Método para deletar o carrinho do cliente
+    public async Task DeleteCartAsync(int clientId)
+    {
+        var cart = await _cartRepository.GetCartByClientIdAsync(clientId);
+        if (cart == null)
+        {
+            throw new ArgumentException("Carrinho não encontrado para o cliente.");
+        }
 
+        await _cartRepository.DeleteCartAsync(clientId);
+    }
 
     private CartDTO MapToCartDTO(Cart cart)
     {
@@ -129,7 +154,7 @@ public class CartService : ICartService
             ClientId = cart.ClientId,
             Items = cart.Items.Select(i => new CartDTO.CartItemDTO
             {
-                ProductId = i.ProductId,
+                Product = _mapper.Map<ProductDTO>(i.Product),
                 Quantity = i.Quantity,
             }).ToList()
         };

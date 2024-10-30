@@ -1,4 +1,6 @@
-﻿namespace EcommerceAPI.DTOs;
+﻿using System.Text.Json.Serialization;
+
+namespace EcommerceAPI.DTOs;
 
 public class CartDTO
 {
@@ -8,6 +10,8 @@ public class CartDTO
 
     public class CartItemDTO
     {
+        public ProductDTO Product { get; set; }
+        [JsonIgnore]
         public int ProductId { get; set; }
         public int Quantity { get; set; }
     }

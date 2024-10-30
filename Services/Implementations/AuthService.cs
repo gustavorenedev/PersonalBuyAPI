@@ -1,5 +1,4 @@
 ﻿using EcommerceAPI.DTOs;
-using EcommerceAPI.Repositories.Implementations;
 using EcommerceAPI.Repositories.Interfaces;
 using EcommerceAPI.Services.Interfaces;
 

@@ -32,4 +32,17 @@ public class CartRepository : ICartRepository
         _context.Carts.Update(cart);
         await _context.SaveChangesAsync();
     }
+
+    public async Task DeleteCartAsync(int clientId)
+    {
+        var cart = await _context.Carts
+            .Include(c => c.Items)
+            .FirstOrDefaultAsync(c => c.ClientId == clientId);
+
+        if (cart != null)
+        {
+            _context.Carts.Remove(cart);
+            await _context.SaveChangesAsync();
+        }
+    }
 }

@@ -19,6 +19,8 @@ builder.Services.AddDbContext<ApplicationContext>(o =>
     o.UseOracle(builder.Configuration.GetConnectionString("OracleConnection"));
 });
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 // Registro dos Repositories
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -29,6 +31,8 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddHttpClient<IPaymentService, PaymentService>();
 
 // Configuração do AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -45,7 +49,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     // Configurar exemplos de modelos de dados
-    c.SchemaFilter<SwaggerSchemaExamplesFilter>();
+    //c.SchemaFilter<SwaggerSchemaExamplesFilter>();
 });
 
 #endregion
@@ -184,9 +188,9 @@ cartApi.MapPost("/{clientId}/create", async (int clientId, ICartService cartServ
     .WithTags("Carts")
     .WithDescription("Cria um carrinho de compras para um cliente.");
 
-cartApi.MapPost("/{clientId}/add", async (int clientId, [FromBody] CartDTO.CartItemDTO cartItemDto, ICartService cartService) =>
+cartApi.MapPost("/{clientId}/add", async (int clientId, [FromBody] AddProductoToCartDTO dto, ICartService cartService) =>
 {
-    var updatedCart = await cartService.AddProductToCartAsync(clientId, cartItemDto);
+    var updatedCart = await cartService.AddProductToCartAsync(clientId, dto);
     return Results.Ok(updatedCart);
 })
     .WithName("AddProductToCart")
@@ -210,6 +214,36 @@ cartApi.MapPut("/{clientId}/update/{productId}/{quantityChange}", async (int cli
     .WithName("UpdateProductQuantityInCart")
     .WithTags("Carts")
     .WithDescription("Atualiza a quantidade de um produto no carrinho de compras de um cliente.");
+
+cartApi.MapDelete("/{clientId}/delete", async (int clientId, ICartService cartService) =>
+{
+    try
+    {
+        await cartService.DeleteCartAsync(clientId);
+        return Results.NoContent(); // Retorna 204 No Content se a exclusão for bem-sucedida
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.NotFound(ex.Message); // Retorna 404 se o carrinho não for encontrado
+    }
+})
+    .WithName("DeleteCart")
+    .WithTags("Carts")
+    .WithDescription("Exclui o carrinho de compras de um cliente.");
+#endregion
+
+#region Rota para Pagamento
+var paymentApi = app.MapGroup("/Payment");
+
+paymentApi.MapPost("/{clientId}", async (int clientId, IPaymentService paymentService) =>
+{
+    var payment = await paymentService.PaymentCart(clientId);
+    return Results.Ok(payment);
+})
+    .WithName("Payment")
+    .WithTags("Payments")
+    .WithDescription("Faz o pagamento do carrinho do cliente");
+
 #endregion
 
 app.Run();
