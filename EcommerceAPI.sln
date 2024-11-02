@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EcommerceAPI", "EcommerceAP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalBuyPaymentAPI", "..\PersonalBuyPaymentAPI\PersonalBuyPaymentAPI.csproj", "{A7F1B7FD-A450-4F48-957E-1939B0050231}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecommendationProductAPI", "..\RecommendationProductAPI\RecommendationProductAPI.csproj", "{32E17623-6AE6-4DF0-843D-BFE3AB7A9F34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecommendationProductAPI", "..\RecommendationProductAPI\RecommendationProductAPI.csproj", "{32E17623-6AE6-4DF0-843D-BFE3AB7A9F34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{F3BF3F62-A5A6-4BAC-BCEB-7411476501D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{32E17623-6AE6-4DF0-843D-BFE3AB7A9F34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32E17623-6AE6-4DF0-843D-BFE3AB7A9F34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32E17623-6AE6-4DF0-843D-BFE3AB7A9F34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3BF3F62-A5A6-4BAC-BCEB-7411476501D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3BF3F62-A5A6-4BAC-BCEB-7411476501D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3BF3F62-A5A6-4BAC-BCEB-7411476501D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3BF3F62-A5A6-4BAC-BCEB-7411476501D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

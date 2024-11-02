@@ -25,7 +25,6 @@ public class ClientService : IClientService
 
         ValidateClientDto(clientDto);
 
-        // Verifica se já existe um cliente com o mesmo email
         var existingClient = await _clientRepository.GetClientByEmailAsync(clientDto.Email);
         if (existingClient != null)
             throw new InvalidOperationException("Já existe um cliente com o mesmo email");
